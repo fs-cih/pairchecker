@@ -196,6 +196,7 @@
               id="codeInput"
               autocomplete="off"
               placeholder="Enter your one-time use code"
+              maxlength="15"
             />
             <div id="codeStatus" class="status-message"></div>
           </div>
@@ -208,20 +209,20 @@
         <div class="card">
           <div class="card-title">Pair Selection Checker</div>
           <div class="helper-text" style="margin-bottom: 12px;">
-            The Guess button is enabled when a valid code has been verified and
+            The button to check your guess is enabled only when a valid code has been verified and
             two different entries are selected.
           </div>
 
           <div class="selectors-row">
             <div class="field-group">
-              <label for="selectOne">First word/phrase</label>
+              <label for="selectOne">Barrel Jack 1</label>
               <select id="selectOne">
                 <option value="">— Select —</option>
               </select>
             </div>
 
             <div class="field-group">
-              <label for="selectTwo">Second word/phrase</label>
+              <label for="selectTwo">Barrel Jack 2</label>
               <select id="selectTwo">
                 <option value="">— Select —</option>
               </select>
@@ -229,7 +230,7 @@
           </div>
 
           <div class="actions-row">
-            <button id="guessButton" disabled>Guess</button>
+            <button id="guessButton" disabled>Check Pair</button>
             <div id="guessStatus" class="status-message"></div>
           </div>
         </div>
