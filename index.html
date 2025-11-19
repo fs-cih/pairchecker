@@ -662,22 +662,41 @@
       }
     }
 
-    // Refresh data from Google Sheets (placeholder for Apps Script integration)
+    // Refresh data from Google Sheets
     async function refreshData() {
-      // TODO: This will be connected to Google Apps Script in the future
-      // For now, we'll just update the timestamp
-      
+      const tbody = document.getElementById("dataTableBody");
+
       try {
-        // Future implementation: fetch data from Apps Script
-        // const url = SCRIPT_URL + "?action=getGuessesData";
-        // const response = await fetch(url);
-        // const data = await response.json();
-        // updateTable(data.rows);
-        
-        // For now, just show the timestamp
+        const url = SCRIPT_URL + "?action=getTokensData";
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!data || data.result !== "ok" || !Array.isArray(data.rows)) {
+          console.error("Unexpected response from getTokensData:", data);
+          return;
+        }
+
+        // Clear any existing rows
+        tbody.innerHTML = "";
+
+        // Build a row for each used token
+        data.rows.forEach(row => {
+          const [code, dateUsed, item1, item2] = row;
+          const tr = document.createElement("tr");
+
+          [code, dateUsed, item1, item2].forEach(cellVal => {
+            const td = document.createElement("td");
+            td.textContent = cellVal || "";
+            tr.appendChild(td);
+          });
+
+          tbody.appendChild(tr);
+        });
+
+        // Update the "Last Refreshed" timestamp
         updateLastRefreshedTime();
       } catch (err) {
-        console.error(err);
+        console.error("Error refreshing data:", err);
       }
     }
 
