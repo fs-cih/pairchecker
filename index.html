@@ -147,6 +147,22 @@
       background-color: #0064cc;
     }
 
+    #validateButton {
+      background-color: #c9c9c9;
+      color: #444444;
+      cursor: not-allowed;
+    }
+
+    #validateButton:enabled {
+      background-color: #28a745;
+      color: #ffffff;
+      cursor: pointer;
+    }
+
+    #validateButton:enabled:hover {
+      background-color: #218838;
+    }
+
     .helper-text {
       font-size: 12px;
       color: #666666;
@@ -175,7 +191,6 @@
           <div class="card-title">One-Time Use Code</div>
 
           <div class="field-group">
-            <label for="codeInput">Code</label>
             <input
               type="text"
               id="codeInput"
@@ -183,16 +198,19 @@
               placeholder="Enter your one-time use code"
             />
             <div id="codeStatus" class="status-message"></div>
-            <div class="helper-text">
-              Code validity is checked with the server when you leave this box
-              or press Enter.
-            </div>
+          </div>
+          <div class="actions-row">
+            <button id="validateButton" disabled>Validate Code</button>
           </div>
         </div>
 
         <!-- Card 2: Pair Selection -->
         <div class="card">
-          <div class="card-title">Select a Pair</div>
+          <div class="card-title">Pair Selection Checker</div>
+          <div class="helper-text" style="margin-bottom: 12px;">
+            The Guess button is enabled when a valid code has been verified and
+            two different entries are selected.
+          </div>
 
           <div class="selectors-row">
             <div class="field-group">
@@ -213,11 +231,6 @@
           <div class="actions-row">
             <button id="guessButton" disabled>Guess</button>
             <div id="guessStatus" class="status-message"></div>
-          </div>
-
-          <div class="helper-text">
-            The Guess button is enabled when a valid code has been verified and
-            two different entries are selected.
           </div>
         </div>
       </div>
@@ -359,6 +372,7 @@
 
     const codeInput = document.getElementById("codeInput");
     const codeStatus = document.getElementById("codeStatus");
+    const validateButton = document.getElementById("validateButton");
     const selectOne = document.getElementById("selectOne");
     const selectTwo = document.getElementById("selectTwo");
     const guessButton = document.getElementById("guessButton");
@@ -408,6 +422,17 @@
 
       guessButton.disabled = !canGuess;
       guessButton.classList.toggle("enabled", canGuess);
+    }
+
+    // Check if code is valid 15-digit alphanumeric
+    function isValidCodeFormat(code) {
+      return /^[a-zA-Z0-9]{15}$/.test(code);
+    }
+
+    // Enable / disable Validate button based on code format
+    function updateValidateButtonState() {
+      const code = codeInput.value.trim();
+      validateButton.disabled = !isValidCodeFormat(code);
     }
 
     // Validate code via Apps Script
@@ -509,10 +534,16 @@
     document.addEventListener("DOMContentLoaded", () => {
       populateSelectors();
 
-      codeInput.addEventListener("blur", validateCode);
-      codeInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
+      codeInput.addEventListener("input", () => {
+        codeIsValid = false;
+        setCodeStatus("", null);
+        updateValidateButtonState();
+        updateGuessButtonState();
+      });
+
+      validateButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (!validateButton.disabled) {
           validateCode();
         }
       });
