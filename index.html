@@ -212,6 +212,13 @@
       margin-top: 8px;
     }
 
+    .table-placeholder {
+      font-size: 14px;
+      color: #666666;
+      padding: 16px 0;
+      text-align: center;
+    }
+
     @media (max-width: 900px) {
       .columns {
         flex-direction: column;
@@ -288,9 +295,13 @@
         <div class="card">
           <div class="card-title">Check Guesses Remaining</div>
           
-          <button id="refreshDataButton" class="refresh-button">Refresh Data</button>
+          <button id="refreshDataButton" class="refresh-button">Check Code Use</button>
           
-          <table class="data-table">
+          <div id="tablePlaceholder" class="table-placeholder">
+            Click the button to retrieve a record of past code usage.
+          </div>
+          
+          <table class="data-table" id="dataTable" style="display: none;">
             <thead>
               <tr>
                 <th>Code</th>
@@ -300,66 +311,6 @@
               </tr>
             </thead>
             <tbody id="dataTableBody">
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
             </tbody>
           </table>
           
@@ -665,6 +616,8 @@
     // Refresh data from Google Sheets
     async function refreshData() {
       const tbody = document.getElementById("dataTableBody");
+      const dataTable = document.getElementById("dataTable");
+      const tablePlaceholder = document.getElementById("tablePlaceholder");
 
       try {
         const url = SCRIPT_URL + "?action=getTokensData";
@@ -692,6 +645,10 @@
 
           tbody.appendChild(tr);
         });
+
+        // Hide placeholder and show table
+        tablePlaceholder.style.display = "none";
+        dataTable.style.display = "table";
 
         // Update the "Last Refreshed" timestamp
         updateLastRefreshedTime();
