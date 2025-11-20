@@ -285,7 +285,7 @@
     }
 
     .toc-link {
-      font-family: 'Courier New', Courier, monospace;
+      font-family: monospace;
       font-size: 16px;
       color: #007bff;
       text-decoration: none;
@@ -922,13 +922,8 @@
         });
       });
 
-      // Initialize on page 3 (Pair Checker)
-      setTimeout(() => {
-        navButtons.forEach(btn => btn.classList.remove('active'));
-        navButtons[2].classList.add('active'); // 3rd button (index 2)
-        pageViews.forEach(page => page.classList.remove('active'));
-        document.getElementById('page3').classList.add('active');
-      }, 0);
+      // Initialize on page 1 (Table of Contents) - but page is locked by default
+      // The initial HTML already has page1 and first nav button as active
 
       // Set up Pair Checker event listeners
       codeInput.addEventListener("input", () => {
