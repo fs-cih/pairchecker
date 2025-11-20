@@ -15,6 +15,65 @@
         sans-serif;
       background-color: #f2f2f2;
       color: #000000;
+      display: flex;
+    }
+
+    /* Navigation sidebar */
+    .nav-sidebar {
+      width: 80px;
+      background-color: #ffffff;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 20px;
+      gap: 20px;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+
+    .nav-button {
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 12px;
+      transition: background-color 0.2s ease;
+      position: relative;
+      font-size: 24px;
+    }
+
+    .nav-button:hover {
+      background-color: #f0f0f0;
+    }
+
+    .nav-button.active {
+      background-color: #007bff;
+      color: #ffffff;
+    }
+
+    .nav-button.active:hover {
+      background-color: #0064cc;
+    }
+
+    /* Main content area */
+    .main-content {
+      margin-left: 80px;
+      width: calc(100% - 80px);
+      min-height: 100vh;
+    }
+
+    .page-view {
+      display: none;
+    }
+
+    .page-view.active {
+      display: block;
     }
 
     .page-wrapper {
@@ -219,6 +278,48 @@
       text-align: center;
     }
 
+    /* Table of Contents page specific styles */
+    .toc-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .toc-button {
+      background-color: #007bff;
+      color: #ffffff;
+      border-radius: 999px;
+      border: none;
+      padding: 16px 32px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.05s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .toc-button:hover {
+      background-color: #0064cc;
+    }
+
+    .toc-button:active {
+      transform: translateY(1px);
+    }
+
+    /* Placeholder pages */
+    .placeholder-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      font-size: 24px;
+      color: #666666;
+    }
+
     @media (max-width: 900px) {
       .columns {
         flex-direction: column;
@@ -231,12 +332,62 @@
         width: 100%;
         padding-left: 0;
       }
+      .nav-sidebar {
+        width: 60px;
+      }
+      .main-content {
+        margin-left: 60px;
+        width: calc(100% - 60px);
+      }
+      .nav-button {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="page-wrapper">
-    <h1>Pair Checker</h1>
+  <!-- Navigation Sidebar -->
+  <div class="nav-sidebar">
+    <div class="nav-button active" data-page="1" title="Table of Contents">
+      ☰
+    </div>
+    <div class="nav-button" data-page="2" title="Star">
+      ★
+    </div>
+    <div class="nav-button" data-page="3" title="Pair">
+      ⚯
+    </div>
+    <div class="nav-button" data-page="4" title="Links">
+      🔗
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Page 1: Table of Contents -->
+    <div class="page-view active" id="page1">
+      <div class="toc-container">
+        <a href="https://drive.google.com/file/d/11pcnsO4uNOerLy9b8kZroxnfFWZRXQ2T/view?usp=sharing" 
+           target="_blank" 
+           class="toc-button">
+          Table of Contents
+        </a>
+      </div>
+    </div>
+
+    <!-- Page 2: Star (Placeholder) -->
+    <div class="page-view" id="page2">
+      <div class="placeholder-container">
+        Star Page Content
+      </div>
+    </div>
+
+    <!-- Page 3: Pair Checker -->
+    <div class="page-view" id="page3">
+      <div class="page-wrapper">
+        <h1>Pair Checker</h1>
 
     <div class="columns">
       <div class="left-column">
@@ -316,6 +467,14 @@
           
           <div id="lastRefreshed" class="last-refreshed" style="display: none;"></div>
         </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page 4: Links (Placeholder) -->
+    <div class="page-view" id="page4">
+      <div class="placeholder-container">
+        Links Page Content
       </div>
     </div>
   </div>
@@ -450,16 +609,7 @@
     // ================= APP LOGIC =================
     let codeIsValid = false;
     let currentCode = "";
-
-    const codeInput = document.getElementById("codeInput");
-    const codeStatus = document.getElementById("codeStatus");
-    const validateButton = document.getElementById("validateButton");
-    const selectOne = document.getElementById("selectOne");
-    const selectTwo = document.getElementById("selectTwo");
-    const guessButton = document.getElementById("guessButton");
-    const guessStatus = document.getElementById("guessStatus");
-    const refreshDataButton = document.getElementById("refreshDataButton");
-    const lastRefreshed = document.getElementById("lastRefreshed");
+    let codeInput, codeStatus, validateButton, selectOne, selectTwo, guessButton, guessStatus, refreshDataButton, lastRefreshed;
 
     // Populate both selectors with entries
     function populateSelectors() {
@@ -675,10 +825,49 @@
       lastRefreshed.style.display = 'block';
     }
 
-    // ================= EVENT WIRING =================
+    // ================= INITIALIZATION =================
     document.addEventListener("DOMContentLoaded", () => {
+      // Initialize DOM element references for Pair Checker
+      codeInput = document.getElementById("codeInput");
+      codeStatus = document.getElementById("codeStatus");
+      validateButton = document.getElementById("validateButton");
+      selectOne = document.getElementById("selectOne");
+      selectTwo = document.getElementById("selectTwo");
+      guessButton = document.getElementById("guessButton");
+      guessStatus = document.getElementById("guessStatus");
+      refreshDataButton = document.getElementById("refreshDataButton");
+      lastRefreshed = document.getElementById("lastRefreshed");
+
+      // Populate selectors
       populateSelectors();
 
+      // Set up navigation
+      const navButtons = document.querySelectorAll('.nav-button');
+      const pageViews = document.querySelectorAll('.page-view');
+
+      navButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const pageNum = button.getAttribute('data-page');
+          
+          // Update active state on buttons
+          navButtons.forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+          
+          // Update active page view
+          pageViews.forEach(page => page.classList.remove('active'));
+          document.getElementById(`page${pageNum}`).classList.add('active');
+        });
+      });
+
+      // Initialize on page 3 (Pair Checker)
+      setTimeout(() => {
+        navButtons.forEach(btn => btn.classList.remove('active'));
+        navButtons[2].classList.add('active'); // 3rd button (index 2)
+        pageViews.forEach(page => page.classList.remove('active'));
+        document.getElementById('page3').classList.add('active');
+      }, 0);
+
+      // Set up Pair Checker event listeners
       codeInput.addEventListener("input", () => {
         codeIsValid = false;
         setCodeStatus("", null);
