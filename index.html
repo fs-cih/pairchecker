@@ -286,7 +286,7 @@
 
     .toc-link {
       font-family: monospace;
-      font-size: 16px;
+      font-size: 14px;
       color: #007bff;
       text-decoration: none;
       display: inline-block;
@@ -558,7 +558,10 @@
     };
 
     // Track which pages have been unlocked
-    let unlockedPages = {};
+    // Page 1 (Table of Contents) starts unlocked since it's the initial page
+    let unlockedPages = {
+      '1': true
+    };
 
     // ================= DATA: WORDS / PHRASES =================
     const entries = [
@@ -915,7 +918,16 @@
           
           // Check if page requires password and is not unlocked
           if (!unlockedPages[pageNum]) {
-            showPasswordDialog(pageNum);
+            // First update the navigation to show where we're trying to go
+            const navButtons = document.querySelectorAll('.nav-button');
+            const pageViews = document.querySelectorAll('.page-view');
+            
+            // Update active state on buttons to show target page
+            navButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Now show password dialog with correct hint number
+            showPasswordDialog(pageNum, navButtons, pageViews);
           } else {
             navigateToPage(pageNum, navButtons, pageViews);
           }
@@ -964,7 +976,7 @@
     });
 
     // Show password dialog for a specific page
-    function showPasswordDialog(pageNum) {
+    function showPasswordDialog(pageNum, navButtons, pageViews) {
       // Create overlay
       const overlay = document.createElement('div');
       overlay.className = 'password-overlay';
@@ -982,7 +994,7 @@
       // Handle Enter key
       input.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-          checkPassword(pageNum, input.value, overlay);
+          checkPassword(pageNum, input.value, overlay, navButtons, pageViews);
         }
       });
       
@@ -995,7 +1007,7 @@
     }
 
     // Check if password is correct
-    function checkPassword(pageNum, enteredPassword, overlay) {
+    function checkPassword(pageNum, enteredPassword, overlay, navButtons, pageViews) {
       const correctPassword = PAGE_PASSWORDS[pageNum];
       
       if (enteredPassword.toLowerCase() === correctPassword) {
@@ -1003,16 +1015,29 @@
         unlockedPages[pageNum] = true;
         document.body.removeChild(overlay);
         
-        const navButtons = document.querySelectorAll('.nav-button');
-        const pageViews = document.querySelectorAll('.page-view');
         navigateToPage(pageNum, navButtons, pageViews);
       } else {
-        // Password incorrect - shake the dialog or show error
+        // Password incorrect - shake the dialog and revert navigation
         const dialog = overlay.querySelector('.password-dialog');
         dialog.style.animation = 'shake 0.3s';
         setTimeout(() => {
           dialog.style.animation = '';
         }, 300);
+        
+        // Revert navigation to last unlocked page (page 1)
+        // Find the last unlocked page to navigate back to
+        let lastUnlockedPage = '1';
+        for (let i = parseInt(pageNum) - 1; i >= 1; i--) {
+          if (unlockedPages[i.toString()]) {
+            lastUnlockedPage = i.toString();
+            break;
+          }
+        }
+        
+        // Revert the active button state
+        navButtons.forEach(btn => btn.classList.remove('active'));
+        const revertButton = Array.from(navButtons).find(btn => btn.getAttribute('data-page') === lastUnlockedPage);
+        if (revertButton) revertButton.classList.add('active');
       }
     }
 
